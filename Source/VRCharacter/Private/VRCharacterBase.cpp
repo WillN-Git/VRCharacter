@@ -7,7 +7,7 @@
 // Sets default values
 AVRCharacterBase::AVRCharacterBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this character to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// VROffset
@@ -24,14 +24,14 @@ AVRCharacterBase::AVRCharacterBase()
 	HandControllerBase->SetupAttachment(VROffset);
 
 	// LeftHandController
-	LeftHandController = CreateDefaultSubobject<UMotionControllerComponent>("LeftHandController");
-	LeftHandController->SetupAttachment(HandControllerBase);
-	LeftHandController->SetTrackingMotionSource(FName("Left"));
+	//LeftHandController = CreateDefaultSubobject<UMotionControllerComponent>("LeftHandController");
+	//LeftHandController->SetupAttachment(HandControllerBase);
+	//LeftHandController->SetTrackingMotionSource(FName("Left"));
 
 	// RightHandController
-	RightHandController = CreateDefaultSubobject<UMotionControllerComponent>("RightHandController");
-	RightHandController->SetupAttachment(HandControllerBase);
-	RightHandController->SetTrackingMotionSource(FName("Right"));
+	//RightHandController = CreateDefaultSubobject<UMotionControllerComponent>("RightHandController");
+	//RightHandController->SetupAttachment(HandControllerBase);
+	//RightHandController->SetTrackingMotionSource(FName("Right"));
 
 }
 
@@ -50,7 +50,7 @@ void AVRCharacterBase::BeginPlay()
 void AVRCharacterBase::CharacterMoveForward(float ratio)
 {
 	const FVector cameraDirection = FVector(VRCamera->GetForwardVector().X, VRCamera->GetForwardVector().Y, 0);
-	const FVector cameraProjectedForward = cameraDirection.GetSafeNormal();
+	const FVector cameraProjectedForward = cameraDirection.GetSafeNormal(); // Normalized vector
 
 	AddActorWorldOffset(cameraProjectedForward * ratio * MaximumSpeed);
 }
@@ -62,8 +62,8 @@ void AVRCharacterBase::CharacterMoveForward(float ratio)
 */
 void AVRCharacterBase::FindFocusDistance()
 {
-	FVector start = VRCamera->GetComponentLocation();
-	FVector end = start + VRCamera->GetForwardVector() * MaximumFocusTrackingDistance;
+	const FVector start = VRCamera->GetComponentLocation();
+	const FVector end = start + VRCamera->GetForwardVector() * MaximumFocusTrackingDistance;
 	FCameraFocusSettings focusSettings;
 	FHitResult hitResult;
 

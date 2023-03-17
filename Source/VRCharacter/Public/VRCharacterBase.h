@@ -24,11 +24,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		USceneComponent* HandControllerBase;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		UMotionControllerComponent* LeftHandController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		UMotionControllerComponent* RightHandController;
+		UMotionControllerComponent* RightHandController;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 		float MaximumSpeed = 3.0f;
