@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "VRCharacterBase.h"
 #include "MotionControllerComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -112,9 +113,21 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Variables|Grabbing")
         TMap<EHandTriggers, UCapsuleComponent*> FingerTriggers;
 
+    //========================== Teleportation Variables ==========================
+    bool bTracingForTeleportation;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
+        AVRCharacterBase* VRCharacter;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Teleportation")
+        float TeleportTraceProjectileVelocity = 1000.0f;
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+    //========================== Grasping Logic ==========================
 
     UFUNCTION(BlueprintCallable, Category = "Gabbing")
         AActor* ObjectSelection();
@@ -139,6 +152,16 @@ protected:
 
     UFUNCTION(BlueprintCallable, Category = "Grabbing")
         void ReleaseActor();
+
+    //========================== Teleportation Logic ==========================
+
+    void TraceForTeleportLocation();
+
+    UFUNCTION(BlueprintCallable)
+        void BeginTeleport();
+
+    UFUNCTION(BlueprintCallable)
+        void EndTeleport();
 
 private:
     void InitFingerFlex();

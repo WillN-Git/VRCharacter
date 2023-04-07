@@ -3,6 +3,7 @@
 
 #include "VRMotionController.h"
 #include "PickupActorInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
@@ -66,7 +67,8 @@ AVRMotionController::AVRMotionController()
 void AVRMotionController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+    VRCharacter = Cast<AVRCharacterBase>(GetOwner());
 }
 
 // Called every frame
@@ -74,7 +76,14 @@ void AVRMotionController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+    if (bTracingForTeleportation)
+    {
+        TraceForTeleportLocation();
+    }
 }
+
+//========================== Grasping Logic ==========================
 
 // Returns the nearest mesh that's overlapping the hand
 AActor* AVRMotionController::ObjectSelection()
@@ -227,20 +236,20 @@ void AVRMotionController::GrabActor()
 {
     bWantToGrip = true;
 
-    AActor* nearestActor = ObjectSelection();
+    //AActor* nearestActor = ObjectSelection();
 
-    if (nearestActor != NULL)
-    {
-        AttachedActor = nearestActor;
+    //if (nearestActor != NULL)
+    //{
+    //    AttachedActor = nearestActor;
 
-        IPickupActorInterface* pickableActor = Cast<IPickupActorInterface>(nearestActor);
+    //    IPickupActorInterface* pickableActor = Cast<IPickupActorInterface>(nearestActor);
 
-        if (pickableActor != NULL)
-        {
-            pickableActor->Pickup(MotionController);
-            // Rumble controller : {Intensity: 0.7}
-        }
-    }
+    //    if (pickableActor != NULL)
+    //    {
+    //        pickableActor->Pickup(MotionController);
+    //        // Rumble controller : {Intensity: 0.7}
+    //    }
+    //}
 
 }
 
@@ -248,21 +257,21 @@ void AVRMotionController::ReleaseActor()
 {
     bWantToGrip = false;
 
-    if (AttachedActor != NULL && AttachedActor->Implements<UPickupActorInterface>())
-    {
-        auto attachedParent = AttachedActor->GetRootComponent()->GetAttachParent();
+    //if (AttachedActor != NULL && AttachedActor->Implements<UPickupActorInterface>())
+    //{
+    //    auto attachedParent = AttachedActor->GetRootComponent()->GetAttachParent();
 
-        // Make sure that the hand still holding the object
-        if (MotionController == attachedParent)
-        {
-            IPickupActorInterface* attachedActor = Cast<IPickupActorInterface>(AttachedActor);
+    //    // Make sure that the hand still holding the object
+    //    if (MotionController == attachedParent)
+    //    {
+    //        IPickupActorInterface* attachedActor = Cast<IPickupActorInterface>(AttachedActor);
 
-            attachedActor->Drop();
-            // Rumble controller : {Intensity: 0.2}
-        }
+    //        attachedActor->Drop();
+    //        // Rumble controller : {Intensity: 0.2}
+    //    }
 
-        AttachedActor = NULL;
-    }
+    //    AttachedActor = NULL;
+    //}
 }
 
 // Put all capsule fingers into a Map
@@ -322,4 +331,46 @@ void AVRMotionController::InitFingerTriggersOverlap()
     FingerTriggersOverlap.Add(EHandTriggers::Middle_2, false);
     FingerTriggersOverlap.Add(EHandTriggers::Ring_2, false);
     FingerTriggersOverlap.Add(EHandTriggers::Pinky_2, false);
+}
+
+//========================== Teleportation Logic ==========================
+
+void AVRMotionController::BeginTeleport()
+{
+    // Start tracing for the teleport location
+    bTracingForTeleportation = true;
+}
+
+void AVRMotionController::EndTeleport()
+{
+    // Start tracing for the teleport location
+    bTracingForTeleportation = false;
+    VRCharacter->TeleportLocationIndicator->SetHiddenInGame(true);
+}
+
+
+void AVRMotionController::TraceForTeleportLocation()
+{
+    // Active trace visualization (Niagara System)
+    FPredictProjectilePathParams predictParams;
+
+    predictParams.bTraceComplex = false;
+    predictParams.bTraceWithChannel = true;
+    predictParams.bTraceWithCollision = true;
+    predictParams.TraceChannel = ECC_Visibility;
+    predictParams.StartLocation = MotionController->GetComponentLocation();
+    predictParams.LaunchVelocity = TeleportTraceProjectileVelocity * MotionController->GetForwardVector();
+
+    FPredictProjectilePathResult predictResult;
+
+
+    if (UGameplayStatics::PredictProjectilePath(this, predictParams, predictResult))
+    {
+        VRCharacter->TeleportLocationIndicator->SetWorldLocation(predictResult.HitResult.Location);
+        VRCharacter->TeleportLocationIndicator->SetHiddenInGame(false);
+    }
+    else
+    {
+        VRCharacter->TeleportLocationIndicator->SetHiddenInGame(true);
+    }
 }

@@ -16,23 +16,18 @@ AVRCharacterBase::AVRCharacterBase()
 	VROffset->SetRelativeLocation(FVector(0, 0, -1 * GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
 
 	// VRCamera
-	VRCamera = CreateDefaultSubobject<UCineCameraComponent>("VRCamera");
+	VRCamera = CreateDefaultSubobject<UCameraComponent>("VRCamera");
 	VRCamera->SetupAttachment(VROffset);
 
 	// HandControllerBase
 	HandControllerBase = CreateDefaultSubobject<USceneComponent>("HandControllerBase");
 	HandControllerBase->SetupAttachment(VROffset);
 
-	// LeftHandController
-	//LeftHandController = CreateDefaultSubobject<UMotionControllerComponent>("LeftHandController");
-	//LeftHandController->SetupAttachment(HandControllerBase);
-	//LeftHandController->SetTrackingMotionSource(FName("Left"));
-
-	// RightHandController
-	//RightHandController = CreateDefaultSubobject<UMotionControllerComponent>("RightHandController");
-	//RightHandController->SetupAttachment(HandControllerBase);
-	//RightHandController->SetTrackingMotionSource(FName("Right"));
-
+    // Teleport Indicator
+    TeleportLocationIndicator = CreateDefaultSubobject<UStaticMeshComponent>("TeleportLocationIndicator");
+    TeleportLocationIndicator->SetupAttachment(RootComponent);
+    TeleportLocationIndicator->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    TeleportLocationIndicator->SetHiddenInGame(true);
 }
 
 // Called when the game starts or when spawned
@@ -62,7 +57,7 @@ void AVRCharacterBase::CharacterMoveForward(float ratio)
 */
 void AVRCharacterBase::FindFocusDistance()
 {
-	const FVector start = VRCamera->GetComponentLocation();
+	/*const FVector start = VRCamera->GetComponentLocation();
 	const FVector end = start + VRCamera->GetForwardVector() * MaximumFocusTrackingDistance;
 	FCameraFocusSettings focusSettings;
 	FHitResult hitResult;
@@ -73,7 +68,7 @@ void AVRCharacterBase::FindFocusDistance()
 		return;
 
 	focusSettings.ManualFocusDistance = hitResult.Distance;
-	VRCamera->SetFocusSettings(focusSettings);
+	VRCamera->SetFocusSettings(focusSettings);*/
 }
 
 // Called every frame

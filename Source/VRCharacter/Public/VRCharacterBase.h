@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CineCameraComponent.h"
-#include "MotionControllerComponent.h"
 #include "VRCharacterBase.generated.h"
 
 UCLASS()
@@ -13,22 +12,19 @@ class VRCHARACTER_API AVRCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
 
-
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		USceneComponent* VROffset;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		UCineCameraComponent* VRCamera;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+        //UCineCameraComponent* VRCamera;
+        UCameraComponent* VRCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		USceneComponent* HandControllerBase;
-
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		UMotionControllerComponent* LeftHandController;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		UMotionControllerComponent* RightHandController;*/
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+		UStaticMeshComponent* TeleportLocationIndicator;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 		float MaximumSpeed = 3.0f;
@@ -55,6 +51,4 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
 };
